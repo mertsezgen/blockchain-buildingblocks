@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.11;
 
 contract MertToken{
 	uint256 constant private MAX_UINT256 = 2**256 - 1;
