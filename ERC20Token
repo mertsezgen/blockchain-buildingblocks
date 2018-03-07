@@ -1,27 +1,59 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.17;
 
-contract MyToken {
-    mapping (address => uint256) public balanceOf;
-    
-    string public name;
-    string public symbol;
-    uint8 public decimals; 
-    
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    
-    function MyToken(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits) public {
-        balanceOf[msg.sender]=initialSupply;
-        name = tokenName;
-        symbol=tokenSymbol;
-        decimals=decimalUnits;
-        
+contract MertToken{
+	uint256 constant private MAX_UINT256 = 2**256 - 1;
+	string public name;
+	string public symbol;
+	uint public decimals;
+	uint public totalSupply;
+
+	mapping(address => uint) public balanceOf;
+	mapping(address => mapping(address=>uint)) public allowed;
+
+
+	event Transfer(address indexed from, address indexed to, uint value);
+	event Approval(address indexed spender, address indexed spender, uint value)
+
+	function MertToken public{
+		name = "MertToken";
+		symbol = "MRT";
+		decimals = 18
+		totalSupply = 1000000 * 10 ** uint(decimals);
+		balanceOf[msg.sender] = totalSupply;
+	}
+	function balanceOf(address _owner) public constant returns (uint){
+		return balanceOf;
+	}
+	function totalSupply() public constant returns (uint){
+		return totalSupply;
+	}
+	function transfer(address _to, uint _value) public{
+		require(_to != msg.sender);
+		require(_value != 0);
+		require(balances[msg.sender] >= _value);
+		balances[msg.sender] -= _value;
+		balances[_to] += _value;
+		Transfer(msg.sender, _to, _value);
+	}
+
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        uint256 allowance = allowed[_from][msg.sender];
+        require(balances[_from] >= _value && allowance >= _value);
+        balances[_to] += _value;
+        balances[_from] -= _value;
+        if (allowance < MAX_UINT256) {
+            allowed[_from][msg.sender] -= _value;
+        }
+        Transfer(_from, _to, _value);
+        return true;
     }
-    function transfer(address _to, uint256 _value) public{
-        require(balanceOf[msg.sender]>= _value && balanceOf[_to] + _value >= balanceOf[_to]);
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
-        Transfer(msg.sender,_to,_value);
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        allowed[msg.sender][_spender] = _value;
+        Approval(msg.sender, _spender, _value);
+        return true;
     }
-    
-  
+
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
+        return allowed[_owner][_spender];
+    }   
 }
